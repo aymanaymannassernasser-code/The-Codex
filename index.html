@@ -3,26 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#0a0806">
+  <meta name="theme-color" content="#05070D">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="The Codex">
+  <meta name="apple-mobile-web-app-title" content="Al-Dīwān">
   <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;500;600;700&family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <title>The Codex — Life System</title>
+  <title>Al-Dīwān</title>
 </head>
 <body>
   <div id="app">
 
     <!-- ── HEADER ── -->
     <header id="app-header">
-      <div class="header-ornament left">۞</div>
-      <h1 id="header-title">THE CODEX</h1>
-      <div class="header-ornament right">۞</div>
+      <button id="back-btn" class="header-back" aria-label="Back to Al-Dīwān">
+        <span class="back-arrow">&#8592;</span>
+        <span class="back-label">Dīwān</span>
+      </button>
+      <div class="header-center">
+        <div class="header-ornament">۞</div>
+        <h1 id="header-title">AL-DĪWĀN</h1>
+        <div class="header-ornament">۞</div>
+      </div>
+      <div class="header-right-spacer"></div>
     </header>
 
     <!-- ── MAIN CONTENT ── -->
@@ -39,31 +45,31 @@
     <nav id="main-nav">
       <button class="nav-tab active" data-tab="home">
         <span class="nav-icon">⚜️</span>
-        <span class="nav-label">Keep</span>
+        <span class="nav-label">Dīwān</span>
       </button>
       <button class="nav-tab" data-tab="treasury">
         <span class="nav-icon">💰</span>
-        <span class="nav-label">Treasury</span>
+        <span class="nav-label">Māl</span>
       </button>
       <button class="nav-tab" data-tab="habits">
-        <span class="nav-icon">🛡️</span>
-        <span class="nav-label">Quests</span>
+        <span class="nav-icon">🌙</span>
+        <span class="nav-label">Mudāwama</span>
       </button>
       <button class="nav-tab" data-tab="gym">
         <span class="nav-icon">⚔️</span>
-        <span class="nav-label">Combat</span>
+        <span class="nav-label">Riyāḍa</span>
       </button>
       <button class="nav-tab" data-tab="study">
         <span class="nav-icon">📜</span>
-        <span class="nav-label">Tome</span>
+        <span class="nav-label">Muṭālaʿa</span>
       </button>
       <button class="nav-tab" data-tab="journal">
         <span class="nav-icon">🪶</span>
-        <span class="nav-label">Chronicle</span>
+        <span class="nav-label">Yawmiyyāt</span>
       </button>
     </nav>
 
-  </div><!-- #app -->
+  </div>
 
   <!-- ── MODAL ── -->
   <div id="modal-overlay" class="hidden" role="dialog" aria-modal="true">
