@@ -1,7 +1,7 @@
 /* ════════════════════════════════════════════════
-   AL-DĪWĀN — بيت الحكمة
-   The Personal Register of a Free Thinker
-   Islamic Golden Age · c. 9th–14th Century CE
+   VIGIL — A Method for the Deliberate Life
+   Drawn from: Al-Kindī · Al-Ghazālī
+              Baltasar Gracián · C.G. Jung
 ════════════════════════════════════════════════ */
 
 'use strict';
@@ -182,7 +182,7 @@ let DATA = {};
 /* ══ PERSISTENCE ═════════════════════════════════ */
 function loadData() {
   try {
-    const raw = localStorage.getItem('diwaan_v1');
+    const raw = localStorage.getItem('vigil_v1');
     DATA = raw ? deepMerge(DEFAULT_DATA, JSON.parse(raw)) : JSON.parse(JSON.stringify(DEFAULT_DATA));
   } catch(e) {
     DATA = JSON.parse(JSON.stringify(DEFAULT_DATA));
@@ -190,7 +190,7 @@ function loadData() {
 }
 
 function saveData() {
-  try { localStorage.setItem('diwaan_v1', JSON.stringify(DATA)); }
+  try { localStorage.setItem('vigil_v1', JSON.stringify(DATA)); }
   catch(e) { toast('⚠ Storage limit reached'); }
 }
 
@@ -261,12 +261,12 @@ function hideModal() {
 
 /* ══ NAVIGATION ══════════════════════════════════ */
 const TAB_META = {
-  home:     { title: 'AL-DĪWĀN',     arabic: null },
-  treasury: { title: 'BAYT AL-MĀL',  arabic: 'بيت المال' },
-  habits:   { title: 'AL-MUDĀWAMA',  arabic: 'المداومة' },
-  gym:      { title: 'AL-RIYĀḌA',    arabic: 'الرياضة' },
-  study:    { title: 'AL-MUṬĀLAʿA',  arabic: 'المطالعة' },
-  journal:  { title: 'AL-YAWMIYYĀT', arabic: 'اليوميات' },
+  home:     { title: 'VIGIL',       sub: null },
+  treasury: { title: 'THE ACCOUNT', sub: 'Al-Kindī\'s Device' },
+  habits:   { title: 'THE WATCH',   sub: 'Murāqaba' },
+  gym:      { title: 'THE VESSEL',  sub: 'Physical Discipline' },
+  study:    { title: 'THE LAMP',    sub: 'Al-Muṭālaʿa' },
+  journal:  { title: 'THE WITNESS', sub: 'Nightly Account' },
 };
 
 function setupNav() {
@@ -317,7 +317,7 @@ function showTab(tab) {
 }
 
 /* ═══════════════════════════════════════════════
-   HOME — AL-DĪWĀN
+   HOME — VIGIL
 ═══════════════════════════════════════════════ */
 function renderHome() {
   const el = document.getElementById('tab-home');
@@ -336,58 +336,58 @@ function renderHome() {
   const gregStr     = `${DAY_NAMES[now.getDay()]}, ${now.getDate()} ${MONTH_NAMES[now.getMonth()]} ${now.getFullYear()}`;
   const hijriStr    = todayHijri();
 
-  // Rotate quote by day of year
+  // Rotate quote daily
   const doy   = Math.floor((now - new Date(now.getFullYear(),0,0)) / 86400000);
   const quote = QUOTES[doy % QUOTES.length];
 
   el.innerHTML = `
     <div class="home-banner">
-      <span class="home-crest">🕌</span>
-      <div class="home-greeting">In the name of knowledge</div>
+      <span class="home-crest">🕯️</span>
+      <div class="home-vigil-title">Vigil</div>
       <div class="home-dates">
         <div class="home-date-gregorian">${gregStr}</div>
-        <div class="home-date-hijri">۞ ${hijriStr}</div>
+        <div class="home-date-hijri">◈ ${hijriStr}</div>
       </div>
     </div>
 
-    <div class="home-divider">۞</div>
-    <div class="section-title">The Register</div>
+    <div class="home-divider">◈</div>
+    <div class="section-title">The Five Practices</div>
 
     <div class="home-grid">
-      <div class="home-card" style="--card-tint:rgba(196,136,26,0.05)" onclick="showTab('treasury')">
-        <div class="home-card-arabic">بيت المال</div>
-        <span class="home-card-icon">💰</span>
-        <div class="home-card-name">Bayt al-Māl</div>
-        <div class="home-card-stat">${txToday.length} records today</div>
+      <div class="home-card" style="--card-tint:rgba(184,120,24,0.05)" onclick="showTab('treasury')">
+        <div class="home-card-practice">Al-Kindī · Monthly Audit</div>
+        <span class="home-card-icon">⚖️</span>
+        <div class="home-card-name">The Account</div>
+        <div class="home-card-stat">${txToday.length} entries today</div>
       </div>
-      <div class="home-card" style="--card-tint:rgba(48,168,112,0.05)" onclick="showTab('habits')">
-        <div class="home-card-arabic">المداومة</div>
-        <span class="home-card-icon">🌙</span>
-        <div class="home-card-name">Al-Mudāwama</div>
-        <div class="home-card-stat">${habitsDone}/${habitsTotal} fulfilled</div>
+      <div class="home-card" style="--card-tint:rgba(34,152,122,0.05)" onclick="showTab('habits')">
+        <div class="home-card-practice">Al-Ghazālī · Murāqaba</div>
+        <span class="home-card-icon">◉</span>
+        <div class="home-card-name">The Watch</div>
+        <div class="home-card-stat">${habitsDone}/${habitsTotal} kept today</div>
       </div>
-      <div class="home-card" style="--card-tint:rgba(72,120,212,0.05)" onclick="showTab('gym')">
-        <div class="home-card-arabic">الرياضة</div>
-        <span class="home-card-icon">⚔️</span>
-        <div class="home-card-name">Al-Riyāḍa</div>
+      <div class="home-card" style="--card-tint:rgba(66,114,200,0.05)" onclick="showTab('gym')">
+        <div class="home-card-practice">All four · The body as instrument</div>
+        <span class="home-card-icon">⬡</span>
+        <div class="home-card-name">The Vessel</div>
         <div class="home-card-stat">${gymThisWeek} sessions this week</div>
       </div>
-      <div class="home-card" style="--card-tint:rgba(38,168,192,0.05)" onclick="showTab('study')">
-        <div class="home-card-arabic">المطالعة</div>
-        <span class="home-card-icon">📜</span>
-        <div class="home-card-name">Al-Muṭālaʿa</div>
+      <div class="home-card" style="--card-tint:rgba(32,160,184,0.05)" onclick="showTab('study')">
+        <div class="home-card-practice">Al-Kindī · Intellectual audit</div>
+        <span class="home-card-icon">◬</span>
+        <div class="home-card-name">The Lamp</div>
         <div class="home-card-stat">${todayStudyMin > 0 ? fmtMin(todayStudyMin) + ' today' : 'No study today'}</div>
       </div>
-      <div class="home-card" style="--card-tint:rgba(146,28,40,0.04); grid-column:1/-1" onclick="showTab('journal')">
-        <div class="home-card-arabic">اليوميات</div>
-        <span class="home-card-icon">🪶</span>
-        <div class="home-card-name">Al-Yawmiyyāt</div>
+      <div class="home-card" style="--card-tint:rgba(122,24,32,0.04); grid-column:1/-1" onclick="showTab('journal')">
+        <div class="home-card-practice">Al-Ghazālī + Jung · Nightly account · Honest witness</div>
+        <span class="home-card-icon">🕯️</span>
+        <div class="home-card-name">The Witness</div>
         <div class="home-card-stat">${monthJournal} entries this month</div>
       </div>
     </div>
 
-    <div class="home-divider">۞</div>
-    <div class="section-title">The Sages Speak</div>
+    <div class="home-divider">◈</div>
+    <div class="section-title">The Sages</div>
     <div class="quote-card">
       <span class="quote-open">❝</span>
       <div class="quote-text">${quote.text}</div>
@@ -399,14 +399,14 @@ function renderHome() {
 /* ═══════════════════════════════════════════════
    MODULE HEADER HELPER
 ═══════════════════════════════════════════════ */
-function moduleHeader(arabic, english, subtitle) {
+function moduleHeader(eyebrow, title, subtitle) {
   return `
     <div class="module-header">
-      <div class="module-title-arabic">${arabic}</div>
-      <div class="module-title">${english}</div>
+      <div class="module-eyebrow">${eyebrow}</div>
+      <div class="module-title">${title}</div>
       <div class="module-rule">
-        <div class="module-rule-line reverse"></div>
-        <div class="module-rule-glyph">۞</div>
+        <div class="module-rule-line rev"></div>
+        <div class="module-rule-glyph">◈</div>
         <div class="module-rule-line"></div>
       </div>
       <div class="module-subtitle">${subtitle}</div>
@@ -420,13 +420,13 @@ function moduleHeader(arabic, english, subtitle) {
 function renderTreasury() {
   const el = document.getElementById('tab-treasury');
   el.innerHTML = `
-    ${moduleHeader('بيت المال', 'Bayt al-Māl', 'A complete account of income, expenditure, and reserve')}
+    ${moduleHeader('Al-Kindī · Practice III', 'The Account', 'The complete audit of your financial position — income, expenditure, reserve')}
     <div class="treasury-tabs">
       <button class="treasury-tab ${STATE.treasuryView==='log'?'active':''}"       onclick="switchTreasuryView('log')">Ledger</button>
       <button class="treasury-tab ${STATE.treasuryView==='dashboard'?'active':''}" onclick="switchTreasuryView('dashboard')">Charts</button>
       <button class="treasury-tab ${STATE.treasuryView==='compare'?'active':''}"   onclick="switchTreasuryView('compare')">Monthly</button>
       <button class="treasury-tab ${STATE.treasuryView==='reconcile'?'active':''}" onclick="switchTreasuryView('reconcile')">Balance</button>
-      <button class="treasury-tab ${STATE.treasuryView==='vault'?'active':''}"     onclick="switchTreasuryView('vault')">⚜ Dhahab</button>
+      <button class="treasury-tab ${STATE.treasuryView==='vault'?'active':''}"     onclick="switchTreasuryView('vault')">◈ Reserve</button>
     </div>
     <div id="treasury-view"></div>`;
   renderTreasuryView();
@@ -736,7 +736,7 @@ function renderVault(el) {
   const ts         = gp ? new Date(gp.timestamp).toLocaleTimeString() : null;
 
   el.innerHTML = `
-    <div class="section-title">⚜ Al-Dhahab — الذهب ⚜</div>
+    <div class="section-title">◈ Reserve — Al-Dhahab ◈</div>
     <div class="gold-price-banner">
       <div>
         <div class="gold-price-label">Gold Price (EGP / gram)</div>
@@ -877,7 +877,7 @@ function renderHabits() {
   }).join('');
 
   el.innerHTML = `
-    ${moduleHeader('المداومة','Al-Mudāwama','The daily constancies that shape the self')}
+    ${moduleHeader('Al-Ghazālī · Practice I', 'The Watch', 'Murāqaba — sustained, non-judgmental observation of what you actually do')}
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
         <div class="section-title" style="margin:0">${formatDate(td)}</div>
@@ -954,7 +954,7 @@ function renderGym() {
   }).join('');
 
   el.innerHTML = `
-    ${moduleHeader('الرياضة','Al-Riyāḍa','Physical exercise — training the vessel of the mind')}
+    ${moduleHeader('All Four Sources · Physical Discipline', 'The Vessel', 'The body is the instrument through which the deliberate life is enacted')}
     <div class="gym-stats-row">
       <div class="gym-stat-box"><div class="gym-stat-val">${sessions.filter(s=>new Date(s.date)>=weekAgo).length}</div><div class="gym-stat-label">This Week</div></div>
       <div class="gym-stat-box"><div class="gym-stat-val">${sessions.filter(s=>new Date(s.date)>=monAgo).length}</div><div class="gym-stat-label">This Month</div></div>
@@ -1083,7 +1083,7 @@ function renderStudy() {
   }).join('');
 
   el.innerHTML = `
-    ${moduleHeader('المطالعة','Al-Muṭālaʿa','Sessions of study — recorded in the manner of the scholars')}
+    ${moduleHeader('Al-Kindī · Practice III · Intellectual Audit', 'The Lamp', 'Record what you study, how long, and what you actually understood')}
     <div class="card mb-12">
       <div class="section-title">Pomodoro</div>
       <div class="timer-display">
@@ -1218,11 +1218,11 @@ window.deleteSubject = function(id) {
    اليوميات — The Daily Observations
 ═══════════════════════════════════════════════ */
 const MOODS = [
-  { emoji:'🌟', name:'Illumined', id:'illumined'  },
-  { emoji:'🌿', name:'At Peace',  id:'content'    },
-  { emoji:'🌙', name:'Pensive',   id:'pensive'    },
-  { emoji:'⚡',  name:'Restless',  id:'restless'   },
-  { emoji:'🌑', name:'Burdened',  id:'burdened'   },
+  { emoji:'🕯️', name:'Lucid',    id:'lucid'    },
+  { emoji:'🌿', name:'Settled',  id:'settled'  },
+  { emoji:'🌙', name:'Pensive',  id:'pensive'  },
+  { emoji:'⚡',  name:'Restless', id:'restless' },
+  { emoji:'🌑', name:'Burdened', id:'burdened' },
 ];
 
 function renderJournal() {
@@ -1253,9 +1253,9 @@ function renderJournal() {
   }).join('');
 
   el.innerHTML = `
-    ${moduleHeader('اليوميات','Al-Yawmiyyāt','Personal observations, recorded day by day')}
+    ${moduleHeader('Al-Ghazālī · Practice II + Jung · Practice V', 'The Witness', 'The nightly account and the honest witness — what occurred, what persists')}
     ${dm?`<div class="card" style="text-align:center;padding:12px;margin-bottom:12px">
-      <div style="font-style:italic;font-size:12px;color:var(--text-stone)">Prevailing spirit of this chronicle</div>
+      <div style="font-style:italic;font-size:12px;color:var(--text-stone)">Prevailing state of this record</div>
       <div style="font-size:30px;margin:6px 0">${dm.emoji}</div>
       <div style="font-family:var(--font-cairo);font-size:11px;color:var(--gold);letter-spacing:0.1em">${dm.name.toUpperCase()}</div>
     </div>`:''}
@@ -1265,10 +1265,10 @@ function renderJournal() {
     </div>
     <div class="card">
       <div class="section-title">Entries (${entries.length})</div>
-      ${filtered.length ? entryHTML : '<div class="empty-state"><div class="empty-icon">🪶</div><div class="empty-title">The chronicle is blank</div><div class="empty-sub">Write your first observation</div></div>'}
+      ${filtered.length ? entryHTML : '<div class="empty-state"><div class="empty-icon">🕯️</div><div class="empty-title">The witness is silent</div><div class="empty-sub">Write your first nightly account</div></div>'}
     </div>`;
 
-  addFAB('🪶', () => showAddEntry());
+  addFAB('🕯️', () => showAddEntry());
 }
 
 window.searchJournal = v => { STATE.journalSearch = v; renderJournal(); };
@@ -1297,7 +1297,7 @@ window.viewEntry = function(id) {
 function showAddEntry(prefill) {
   const e = prefill || {};
   showModal(`
-    <div class="modal-title">${e.id?'Edit Entry':'New Observation'}</div>
+    <div class="modal-title">${e.id?'Edit Entry':'Nightly Account'}</div>
     <div class="form-group"><label class="form-label">Title</label><input class="form-control" type="text" id="entry-title" placeholder="Title…" value="${e.title||''}"></div>
     <div class="form-group">
       <label class="form-label">State of Mind</label>
@@ -1313,7 +1313,7 @@ function showAddEntry(prefill) {
       <div class="form-group"><label class="form-label">Tags</label><input class="form-control" type="text" id="entry-tags" placeholder="health, work, ideas" value="${(e.tags||[]).join(', ')}"></div>
       <div class="form-group"><label class="form-label">Date</label><input class="form-control" type="date" id="entry-date" value="${e.date||today()}"></div>
     </div>
-    <button class="btn btn-primary btn-full" onclick="submitEntry('${e.id||''}')">Record Observation</button>`);
+    <button class="btn btn-primary btn-full" onclick="submitEntry('${e.id||''}')">Record Entry</button>`);
 }
 
 window.selectMood = function(id, el) {
