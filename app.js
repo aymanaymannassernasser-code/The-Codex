@@ -1,9 +1,155 @@
 /* ════════════════════════════════════════════════
-   THE CODEX — Life System PWA
+   THE CODEX — Islamic Golden Age Edition
+   بيت الحكمة — House of Wisdom, Baghdad
    app.js — Main Application Logic
 ════════════════════════════════════════════════ */
 
 'use strict';
+
+/* ══ HIJRI CALENDAR ENGINE ═══════════════════════
+   Astronomical calculation — standard algorithm
+   Valid for 622 CE → 2200 CE
+═════════════════════════════════════════════════*/
+function gregorianToHijri(gYear, gMonth, gDay) {
+  // Step 1: Gregorian → Julian Day Number
+  const a = Math.floor((14 - gMonth) / 12);
+  const y = gYear + 4800 - a;
+  const m = gMonth + 12 * a - 3;
+  const jdn = gDay
+    + Math.floor((153 * m + 2) / 5)
+    + 365 * y
+    + Math.floor(y / 4)
+    - Math.floor(y / 100)
+    + Math.floor(y / 400)
+    - 32045;
+
+  // Step 2: Julian Day Number → Hijri
+  const l  = jdn - 1948440 + 10632;
+  const n  = Math.floor((l - 1) / 10631);
+  const l2 = l - 10631 * n + 354;
+  const j  =
+    Math.floor((10985 - l2) / 5316) * Math.floor((50 * l2) / 17719) +
+    Math.floor(l2 / 5670) * Math.floor((43 * l2) / 15238);
+  const l3 = l2
+    - Math.floor((30 - j) / 15) * Math.floor((17719 * j) / 50)
+    - Math.floor(j / 16) * Math.floor((15238 * j) / 43)
+    + 29;
+  const hMonth = Math.floor((24 * l3) / 709);
+  const hDay   = l3 - Math.floor((709 * hMonth) / 24);
+  const hYear  = 30 * n + j - 30;
+
+  return { year: hYear, month: hMonth, day: hDay };
+}
+
+const HIJRI_MONTHS = [
+  'Muharram', 'Ṣafar', "Rabīʿ al-Awwal", "Rabīʿ al-Thānī",
+  "Jumādā al-Awwal", "Jumādā al-Thānī", 'Rajab', "Shaʿbān",
+  'Ramaḍān', 'Shawwāl', "Dhū al-Qaʿdah", "Dhū al-Ḥijjah"
+];
+
+const HIJRI_DAYS = [
+  'al-Aḥad', 'al-Ithnayn', 'al-Thulāthāʾ', 'al-Arbiʿāʾ',
+  'al-Khamīs', 'al-Jumʿah', 'al-Sabt'
+];
+
+function formatHijriDate(dateStr) {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const h = gregorianToHijri(y, m, d);
+  return `${h.day} ${HIJRI_MONTHS[h.month - 1]} ${h.year} AH`;
+}
+
+function todayHijri() {
+  const n = new Date();
+  const h = gregorianToHijri(n.getFullYear(), n.getMonth() + 1, n.getDate());
+  return `${h.day} ${HIJRI_MONTHS[h.month - 1]} ${h.year} AH`;
+}
+
+/* ══ GOLDEN AGE QUOTES ═══════════════════════════
+   Authentic scholars of the Islamic Renaissance
+   ~8th–14th century CE
+═════════════════════════════════════════════════*/
+const GOLDEN_AGE_QUOTES = [
+  {
+    text: "The first step is to know what you do not know.",
+    author: "Ibn Sina (Avicenna)",
+    era: "Physician & Philosopher of Rey, c. 980–1037 CE"
+  },
+  {
+    text: "The duty of the man who investigates the writings of scientists is to make himself an enemy of all that he reads, and attack it from every side. He should also suspect himself as he performs his critical examination, so that he may avoid falling into either prejudice or leniency.",
+    author: "Ibn al-Haytham (Alhazen)",
+    era: "Physicist & Mathematician of Basra, c. 965–1040 CE"
+  },
+  {
+    text: "A prince who does not understand mathematics cannot properly govern.",
+    author: "Al-Bīrūnī",
+    era: "Polymath of Khwarezm, c. 973–1048 CE"
+  },
+  {
+    text: "Knowledge is the most excellent of treasures; it is light and not burden.",
+    author: "Al-Jāḥiẓ",
+    era: "Scholar of Basra, c. 776–869 CE"
+  },
+  {
+    text: "He who knows himself knows his Lord.",
+    author: "Ibn Arabi",
+    era: "Mystic & Philosopher of Murcia, c. 1165–1240 CE"
+  },
+  {
+    text: "Seek knowledge from the cradle to the grave.",
+    author: "Attributed widely in the tradition",
+    era: "Golden Age adage"
+  },
+  {
+    text: "The physician who knows only medicine knows neither medicine nor anything else.",
+    author: "Ibn Rushd (Averroes)",
+    era: "Philosopher & Jurist of Córdoba, c. 1126–1198 CE"
+  },
+  {
+    text: "The world is a book and those who do not travel read only one page.",
+    author: "Ibn Baṭṭūṭah",
+    era: "Explorer of Tangier, c. 1304–1368 CE"
+  },
+  {
+    text: "Mathematics is the key and door to all sciences.",
+    author: "Al-Khwārizmī",
+    era: "Father of Algebra, House of Wisdom, c. 780–850 CE"
+  },
+  {
+    text: "The most excellent science is the one which benefits the greatest number.",
+    author: "Al-Fārābī",
+    era: "Philosopher & Musician of Fārāb, c. 872–950 CE"
+  },
+  {
+    text: "He who does not improve today is not advancing tomorrow.",
+    author: "Ibn Khaldūn",
+    era: "Historian & Sociologist of Tunis, c. 1332–1406 CE"
+  },
+  {
+    text: "The object of our study is to transform the gross into the subtle, and the subtle into the spiritual.",
+    author: "Jābir ibn Ḥayyān (Geber)",
+    era: "Father of Chemistry of Kufa, c. 721–815 CE"
+  },
+  {
+    text: "Observe attentively. Nature never betrays the heart that loves her.",
+    author: "Al-Bīrūnī",
+    era: "Polymath of Khwarezm, c. 973–1048 CE"
+  },
+  {
+    text: "A small act, if good, is better than a great act that is not.",
+    author: "Ibn Ata Allah al-Iskandari",
+    era: "Sufi Scholar of Alexandria, c. 1250–1309 CE"
+  },
+  {
+    text: "Tell me and I forget. Teach me and I remember. Involve me and I learn.",
+    author: "Ibn Khaldūn",
+    era: "Historian & Sociologist of Tunis, c. 1332–1406 CE"
+  },
+  {
+    text: "The moving finger writes, and having writ, moves on; nor all thy piety nor wit shall lure it back to cancel half a line.",
+    author: "Omar Khayyām",
+    era: "Mathematician & Poet of Nishapur, c. 1048–1131 CE"
+  },
+];
 
 /* ══ DEFAULT DATA STRUCTURE ══════════════════════ */
 const DEFAULT_DATA = {
@@ -212,52 +358,62 @@ function renderHome() {
   const todayStudy = DATA.study.sessions.filter(s => s.date === today()).reduce((a,s) => a+s.durationMin, 0);
   const thisMonthEntries = DATA.journal.entries.filter(e => e.date.slice(0,7) === today().slice(0,7)).length;
 
-  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  // Gregorian date
+  const DAYS_LONG   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const MONTHS_LONG = ['January','February','March','April','May','June','July','August','September','October','November','December'];
   const now = new Date();
+  const gregStr = `${DAYS_LONG[now.getDay()]}, ${now.getDate()} ${MONTHS_LONG[now.getMonth()]} ${now.getFullYear()}`;
+
+  // Hijri date
+  const hijriStr = todayHijri();
+
+  // Daily quote — rotate by day of year
+  const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / 86400000);
+  const quote = GOLDEN_AGE_QUOTES[dayOfYear % GOLDEN_AGE_QUOTES.length];
 
   el.innerHTML = `
     <div class="home-banner">
-      <span class="home-crest">🏰</span>
-      <div class="home-greeting">Welcome, Keeper</div>
-      <div class="home-date">${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}</div>
+      <span class="home-crest">🕌</span>
+      <div class="home-greeting">Peace be upon your work</div>
+      <div class="home-date-gregorian">${gregStr}</div>
+      <div class="home-date-hijri">۞ ${hijriStr}</div>
     </div>
-    <div class="home-divider"></div>
-    <div class="section-title">Your Realm</div>
+    <div class="home-divider">۞</div>
+    <div class="section-title">Your Affairs</div>
     <div class="home-grid">
-      <div class="home-card" style="--card-accent:rgba(201,162,39,0.07)" onclick="showTab('treasury')">
+      <div class="home-card" style="--card-accent:rgba(196,136,30,0.06)" onclick="showTab('treasury')">
         <span class="home-card-icon">💰</span>
         <div class="home-card-name">Treasury</div>
-        <div class="home-card-stat">${txToday.length} tx today</div>
+        <div class="home-card-stat">${txToday.length} entries today</div>
       </div>
-      <div class="home-card" style="--card-accent:rgba(74,156,58,0.07)" onclick="showTab('habits')">
+      <div class="home-card" style="--card-accent:rgba(50,168,112,0.06)" onclick="showTab('habits')">
         <span class="home-card-icon">🛡️</span>
         <div class="home-card-name">Quests</div>
-        <div class="home-card-stat">${doneTodayHabits}/${habitsToday} done</div>
+        <div class="home-card-stat">${doneTodayHabits}/${habitsToday} fulfilled</div>
       </div>
-      <div class="home-card" style="--card-accent:rgba(155,32,32,0.07)" onclick="showTab('gym')">
+      <div class="home-card" style="--card-accent:rgba(74,122,214,0.06)" onclick="showTab('gym')">
         <span class="home-card-icon">⚔️</span>
         <div class="home-card-name">Combat</div>
         <div class="home-card-stat">${thisWeekGym} sessions this week</div>
       </div>
-      <div class="home-card" style="--card-accent:rgba(30,61,122,0.1)" onclick="showTab('study')">
+      <div class="home-card" style="--card-accent:rgba(41,174,202,0.06)" onclick="showTab('study')">
         <span class="home-card-icon">📜</span>
-        <div class="home-card-name">Tome</div>
-        <div class="home-card-stat">${todayStudy > 0 ? fmtMin(todayStudy) + ' today' : 'No sessions today'}</div>
+        <div class="home-card-name">The Tome</div>
+        <div class="home-card-stat">${todayStudy > 0 ? fmtMin(todayStudy) + ' studied' : 'No sessions today'}</div>
       </div>
-      <div class="home-card" style="--card-accent:rgba(142,68,173,0.07); grid-column:1/-1" onclick="showTab('journal')">
+      <div class="home-card" style="--card-accent:rgba(196,136,30,0.04); grid-column:1/-1" onclick="showTab('journal')">
         <span class="home-card-icon">🪶</span>
         <div class="home-card-name">Chronicle</div>
         <div class="home-card-stat">${thisMonthEntries} entries this month</div>
       </div>
     </div>
-    <div class="divider"></div>
-    <div class="section-title">Oath of the Day</div>
-    <div class="card card-parchment" style="text-align:center;padding:18px">
-      <div style="font-style:italic;font-size:14px;color:var(--text-dim);line-height:1.8">
-        "Discipline is the bridge between goals and accomplishment."
-      </div>
-      <div style="font-family:var(--font-title);font-size:10px;letter-spacing:0.1em;color:var(--text-faint);margin-top:8px">— Jim Rohn</div>
+    <div class="home-divider">۞</div>
+    <div class="section-title">Wisdom of the Sages</div>
+    <div class="quote-card">
+      <span class="quote-open">❝</span>
+      <div class="quote-text">${quote.text}</div>
+      <div class="quote-author">${quote.author}</div>
+      <div class="quote-era">${quote.era}</div>
     </div>
   `;
 }
@@ -269,13 +425,13 @@ function renderTreasury() {
   const el = document.getElementById('tab-treasury');
   el.innerHTML = `
     <div class="module-title">Treasury</div>
-    <div class="module-subtitle">Track every coin that flows through your hands</div>
+    <div class="module-subtitle">Guard thy dirhams as the scholar guards his manuscripts</div>
     <div class="treasury-tabs">
       <button class="treasury-tab ${STATE.treasuryView==='log'?'active':''}" onclick="switchTreasuryView('log')">Log</button>
       <button class="treasury-tab ${STATE.treasuryView==='dashboard'?'active':''}" onclick="switchTreasuryView('dashboard')">Charts</button>
       <button class="treasury-tab ${STATE.treasuryView==='compare'?'active':''}" onclick="switchTreasuryView('compare')">Monthly</button>
       <button class="treasury-tab ${STATE.treasuryView==='reconcile'?'active':''}" onclick="switchTreasuryView('reconcile')">Balance</button>
-      <button class="treasury-tab ${STATE.treasuryView==='vault'?'active':''}" onclick="switchTreasuryView('vault')">🏆Vault</button>
+      <button class="treasury-tab ${STATE.treasuryView==='vault'?'active':''}" onclick="switchTreasuryView('vault')">⚜ Dhahab</button>
     </div>
     <div id="treasury-view"></div>
   `;
@@ -739,7 +895,7 @@ function renderVault(el) {
   const timestamp = gp ? new Date(gp.timestamp).toLocaleTimeString() : null;
 
   el.innerHTML = `
-    <div class="section-title">⚜ Secret Gold Vault ⚜</div>
+    <div class="section-title">⚜ The Dhahab Vault ⚜</div>
     <div class="gold-price-banner">
       <div>
         <div class="gold-price-label">Gold Price (EGP / gram)</div>
@@ -947,7 +1103,7 @@ function renderHabits() {
 
   el.innerHTML = `
     <div class="module-title">Daily Quests</div>
-    <div class="module-subtitle">Forge your disciplines, one day at a time</div>
+    <div class="module-subtitle">Constancy is the mark of the disciplined mind — Ibn Sina</div>
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
         <div class="section-title" style="margin:0">Today — ${formatDate(todayStr)}</div>
@@ -1060,7 +1216,7 @@ function renderGym() {
 
   el.innerHTML = `
     <div class="module-title">Combat Log</div>
-    <div class="module-subtitle">Record your battles, forge your legend</div>
+    <div class="module-subtitle">The body is the vessel of the mind — tend it as you tend your books</div>
     <div class="gym-stats-row">
       <div class="gym-stat-box">
         <div class="gym-stat-val">${thisWeek}</div>
@@ -1238,7 +1394,7 @@ function renderStudy() {
 
   el.innerHTML = `
     <div class="module-title">The Tome</div>
-    <div class="module-subtitle">Every hour of study is a spell mastered</div>
+    <div class="module-subtitle">As Al-Khwārizmī numbered the stars, number thine hours of study</div>
 
     <!-- Timer -->
     <div class="card mb-12">
@@ -1427,11 +1583,11 @@ window.deleteSubject = function(id) {
    JOURNAL MODULE
 ════════════════════════════════════════════════ */
 const MOODS = [
-  { emoji:'😤', name:'Valiant', id:'valiant' },
-  { emoji:'😊', name:'Content', id:'content' },
-  { emoji:'😐', name:'Neutral', id:'neutral' },
-  { emoji:'😔', name:'Weary',   id:'weary'   },
-  { emoji:'😡', name:'Wrathful',id:'wrathful'},
+  { emoji:'🌟', name:'Illumined',  id:'illumined'  },
+  { emoji:'😊', name:'Grateful',   id:'content'    },
+  { emoji:'🌙', name:'Reflective', id:'neutral'    },
+  { emoji:'😔', name:'Burdened',   id:'weary'      },
+  { emoji:'🔥', name:'Resolute',   id:'wrathful'   },
 ];
 
 function renderJournal() {
@@ -1468,7 +1624,7 @@ function renderJournal() {
 
   el.innerHTML = `
     <div class="module-title">Chronicle</div>
-    <div class="module-subtitle">The written word outlives kingdoms</div>
+    <div class="module-subtitle">Ibn Khaldūn wrote of civilisations; here thou shalt write of thyself</div>
 
     ${dm ? `<div class="card" style="text-align:center;padding:12px;margin-bottom:12px">
       <div style="font-style:italic;font-size:13px;color:var(--text-dim)">Dominant spirit of your chronicle</div>
