@@ -954,15 +954,29 @@ function renderVaultContent(el) {
     <div class="gold-banner">
       <div>
         <div class="gold-price-label">${karat}K per gram (EGP)</div>
-        <div class="gold-price-val">${egpPerGram?fmtEGP(egpPerGram):'—'}</div>
-        <div class="gold-price-ts">${ts?'Updated '+new Date(ts).toLocaleTimeString():'Offline — tap Refresh'}</div>
+        <div class="gold-price-val">${egpPerGram ? fmtEGP(egpPerGram) : '—'}</div>
+        <div class="gold-price-ts">${
+          ts
+            ? `Updated ${new Date(ts).toLocaleTimeString()} · ${DATA.treasury.cachedGoldSource||'auto'}`
+            : 'No price data — tap Refresh or enter manually'
+        }</div>
       </div>
       <div>
         <div class="gold-price-label">Total holding</div>
         <div class="gold-price-val">${totalGrams}g</div>
-        ${totalValue?`<div class="gold-price-ts">≈ ${fmtEGP(totalValue)}</div>`:''}
+        ${totalValue ? `<div class="gold-price-ts">≈ ${fmtEGP(totalValue)}</div>` : ''}
       </div>
       <button class="btn btn-sm" onclick="tryFetchGold(true)">Refresh</button>
+    </div>
+    <div class="card" style="padding:12px;margin-bottom:12px">
+      <div class="form-label mb-8">Manual price override</div>
+      <div style="display:flex;gap:8px">
+        <input type="number" id="manual-gold-price" class="form-control" style="flex:1"
+          placeholder="${karat}K price per gram (EGP)" inputmode="decimal"
+          value="${DATA.treasury.cachedManualGoldEGP||''}">
+        <button class="btn btn-sm" onclick="saveManualGoldPrice()">Set</button>
+      </div>
+      <div class="form-hint">If auto-fetch fails, enter today's ${karat}K rate from any dealer or ذهب.com</div>
     </div>
     <div class="card">
       ${entries.length ? entries.map(e=>{
@@ -994,24 +1008,110 @@ function clearVaultPIN()  { CONFIG.vaultPINHash=null; STATE.vaultUnlocked=true; 
 function changeVaultPIN() { closeSettings(); STATE.coinView='vault'; CONFIG.vaultPINHash=null; STATE.vaultUnlocked=false; saveConfig(); showTab('coin'); }
 
 async function tryFetchGold(force=false) {
-  const now=Date.now();
-  if (!force&&DATA.treasury.cachedGoldTs&&now-DATA.treasury.cachedGoldTs<3600000) return;
+  const now = Date.now();
+  if (!force && DATA.treasury.cachedGoldTs && now - DATA.treasury.cachedGoldTs < 3600000) return;
+
+  // Show loading state
+  const priceEl = document.querySelector('.gold-price-val');
+  const tsEl    = document.querySelector('.gold-price-ts');
+  if (priceEl && tsEl) { tsEl.textContent = 'Fetching…'; }
+
+  // ── GOLD PRICE — try two sources independently ──
+  let usdPerOz = null;
+  let goldSource = '';
+
+  // Source 1: gold-api.com — no key, no rate limit, CORS-enabled
   try {
-    const [g,fx]=await Promise.all([
-      fetch('https://api.metals.live/v1/spot/gold'),
-      fetch('https://open.er-api.com/v6/latest/USD')
-    ]);
-    const gj=await g.json(), fxj=await fx.json();
-    DATA.treasury.cachedGoldPrice=gj[0]?.price;
-    DATA.treasury.cachedEgpRate=fxj.rates?.EGP;
-    DATA.treasury.cachedGoldTs=Date.now();
-    saveData();
-    if(STATE.coinView==='vault'&&STATE.vaultUnlocked) renderCoinBody();
-  } catch(e) {
-    if (navigator.serviceWorker.controller) {
-      navigator.serviceWorker.ready.then(reg=>{if(reg.sync)reg.sync.register('sync-gold').catch(()=>{});});
+    const r = await fetch('https://gold-api.com/price/XAU', { signal: AbortSignal.timeout(6000) });
+    if (r.ok) {
+      const j = await r.json();
+      const p = j.price ?? j.ask ?? j.bid ?? j.Price ?? (Array.isArray(j) ? j[0]?.price : null);
+      if (p && !isNaN(p)) { usdPerOz = parseFloat(p); goldSource = 'gold-api.com'; }
     }
+  } catch(_) {}
+
+  // Source 2: metals.live fallback
+  if (!usdPerOz) {
+    try {
+      const r = await fetch('https://api.metals.live/v1/spot/gold', { signal: AbortSignal.timeout(6000) });
+      if (r.ok) {
+        const j = await r.json();
+        const p = Array.isArray(j) ? j[0]?.price : j?.price ?? j?.gold;
+        if (p && !isNaN(p)) { usdPerOz = parseFloat(p); goldSource = 'metals.live'; }
+      }
+    } catch(_) {}
   }
+
+  // ── EGP EXCHANGE RATE — independent fetch ──
+  let egpRate = DATA.treasury.cachedEgpRate || null; // use last known if fresh fetch fails
+  try {
+    const r = await fetch('https://open.er-api.com/v6/latest/USD', { signal: AbortSignal.timeout(6000) });
+    if (r.ok) {
+      const j = await r.json();
+      const rate = j?.rates?.EGP;
+      if (rate && !isNaN(rate)) egpRate = parseFloat(rate);
+    }
+  } catch(_) {}
+
+  // ── STORE RESULTS ──
+  if (usdPerOz) {
+    DATA.treasury.cachedGoldPrice  = usdPerOz;
+    DATA.treasury.cachedGoldTs     = Date.now();
+    DATA.treasury.cachedGoldSource = goldSource;
+  }
+  if (egpRate) {
+    DATA.treasury.cachedEgpRate = egpRate;
+  }
+
+  if (usdPerOz || egpRate) {
+    saveData();
+    if (STATE.coinView === 'vault' && STATE.vaultUnlocked) renderCoinBody();
+    else if (STATE.coinView === 'vault') {} // locked — don't render
+  } else {
+    // Both failed — show diagnostic
+    if (tsEl) tsEl.textContent = 'Could not reach price sources. Enter manually below.';
+    if (!document.getElementById('gold-manual-row')) injectManualPriceEntry();
+  }
+}
+
+function injectManualPriceEntry() {
+  const card = document.querySelector('.gold-banner')?.closest('.card') ||
+               document.querySelector('.gold-banner')?.parentElement;
+  if (!card) return;
+  const row = document.createElement('div');
+  row.id = 'gold-manual-row';
+  row.style.cssText = 'padding:10px 0;border-top:1px solid var(--amber-border);margin-top:8px';
+  row.innerHTML = `
+    <div style="font-family:var(--cairo);font-size:10px;letter-spacing:.12em;color:var(--text-stone);text-transform:uppercase;margin-bottom:7px">
+      Enter price manually (EGP / gram · 21K)
+    </div>
+    <div style="display:flex;gap:8px">
+      <input type="number" id="manual-gold-price" class="form-control" style="flex:1"
+        placeholder="e.g. 4800" inputmode="decimal"
+        value="${DATA.treasury.cachedManualGoldEGP||''}">
+      <button class="btn btn-sm" onclick="saveManualGoldPrice()">Set</button>
+    </div>
+    <div style="font-family:var(--amiri);font-style:italic;font-size:11px;color:var(--text-shadow);margin-top:5px">
+      Check your local dealer or ذهب.com for the current 21K rate
+    </div>`;
+  card.appendChild(row);
+}
+
+function saveManualGoldPrice() {
+  const val = parseFloat(document.getElementById('manual-gold-price')?.value);
+  if (!val || val <= 0) { toast('Enter a valid price'); return; }
+  // Back-calculate to USD/oz using cached rate or reasonable estimate
+  const egpRate = DATA.treasury.cachedEgpRate || 50;
+  const karat   = CONFIG.goldKarat || 21;
+  // manualEGP/gram for 21K → USD/oz = (manualEGP / egpRate) * (24/karat) * 31.1035
+  const usdPerOz = (val / egpRate) * (24 / karat) * 31.1035;
+  DATA.treasury.cachedGoldPrice     = usdPerOz;
+  DATA.treasury.cachedGoldTs        = Date.now();
+  DATA.treasury.cachedGoldSource    = 'manual';
+  DATA.treasury.cachedManualGoldEGP = val;
+  saveData();
+  toast('◈ Price set manually');
+  renderCoinBody();
 }
 
 function showAddGold() {

@@ -4,7 +4,7 @@
 ════════════════════════════════════════ */
 const CACHE   = 'vigil-v2';
 const ASSETS  = ['/index.html','/style.css','/app.js','/manifest.json'];
-const API_HX  = ['aladhan.com','metals.live','er-api.com','fonts.googleapis.com','fonts.gstatic.com'];
+const API_HX  = ['aladhan.com','metals.live','er-api.com','gold-api.com','fonts.googleapis.com','fonts.gstatic.com'];
 
 self.addEventListener('install',  e => { e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())); });
@@ -57,9 +57,18 @@ self.addEventListener('message', e => {
 
 async function syncGold() {
   try {
-    const [g,fx] = await Promise.all([fetch('https://api.metals.live/v1/spot/gold'),fetch('https://open.er-api.com/v6/latest/USD')]);
-    const gj=await g.json(), fxj=await fx.json();
-    const all = await clients.matchAll({includeUncontrolled:true});
-    all.forEach(c=>c.postMessage({type:'GOLD_UPDATED',usdPerOz:gj[0]?.price,egpRate:fxj.rates?.EGP,ts:Date.now()}));
+    let usdPerOz = null;
+    try {
+      const r=await fetch('https://gold-api.com/price/XAU');
+      if(r.ok){const j=await r.json(); usdPerOz=j.price??j.ask??j.bid??(Array.isArray(j)?j[0]?.price:null);}
+    } catch(_){}
+    if(!usdPerOz){
+      const r=await fetch('https://api.metals.live/v1/spot/gold');
+      if(r.ok){const j=await r.json(); usdPerOz=Array.isArray(j)?j[0]?.price:j?.price;}
+    }
+    const fx=await fetch('https://open.er-api.com/v6/latest/USD');
+    const fxj=await fx.json();
+    const all=await clients.matchAll({includeUncontrolled:true});
+    all.forEach(c=>c.postMessage({type:'GOLD_UPDATED',usdPerOz,egpRate:fxj.rates?.EGP,ts:Date.now()}));
   } catch(_){}
 }
