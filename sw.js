@@ -1,84 +1,65 @@
-/* ═══════════════════════════════════════════════
-   THE CODEX — Service Worker
-   Offline-first caching strategy
-═══════════════════════════════════════════════ */
+/* ════════════════════════════════════════
+   VIGIL — Service Worker v2.0
+   Push · Sync · Periodic · Cache
+════════════════════════════════════════ */
+const CACHE   = 'vigil-v2';
+const ASSETS  = ['/index.html','/style.css','/app.js','/manifest.json'];
+const API_HX  = ['aladhan.com','metals.live','er-api.com','fonts.googleapis.com','fonts.gstatic.com'];
 
-const CACHE_NAME = 'codex-v1';
+self.addEventListener('install',  e => { e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())); });
+self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())); });
 
-const STATIC_ASSETS = [
-  './',
-  './index.html',
-  './style.css',
-  './app.js',
-  './manifest.json',
-  'https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;500;600;700&family=IM+Fell+English:ital@0;1&display=swap',
-];
-
-/* ── INSTALL: cache static assets ── */
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return Promise.allSettled(
-        STATIC_ASSETS.map(url => cache.add(url).catch(e => console.warn('Cache miss:', url, e)))
-      );
-    }).then(() => self.skipWaiting())
-  );
-});
-
-/* ── ACTIVATE: clean old caches ── */
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
-      )
-    ).then(() => self.clients.claim())
-  );
-});
-
-/* ── FETCH: cache-first for local, network-first for APIs ── */
-self.addEventListener('fetch', event => {
-  const url = new URL(event.request.url);
-
-  // For API calls (gold price etc.) — network with timeout, fallback to nothing
-  if (url.hostname.includes('metals.live') || url.hostname.includes('er-api.com')) {
-    event.respondWith(
-      fetch(event.request).catch(() => new Response(JSON.stringify({error:'offline'}), {
-        headers: { 'Content-Type': 'application/json' }
-      }))
-    );
+self.addEventListener('fetch', e => {
+  const url = new URL(e.request.url);
+  if (API_HX.some(h => url.hostname.includes(h))) {
+    e.respondWith(fetch(e.request).catch(() => new Response('{"error":"offline"}',{headers:{'Content-Type':'application/json'}})));
     return;
   }
-
-  // Google Fonts — network first, cache fallback
-  if (url.hostname.includes('fonts.googleapis.com') || url.hostname.includes('fonts.gstatic.com')) {
-    event.respondWith(
-      fetch(event.request)
-        .then(res => {
-          const clone = res.clone();
-          caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
-          return res;
-        })
-        .catch(() => caches.match(event.request))
-    );
-    return;
-  }
-
-  // Local assets — cache first
-  event.respondWith(
-    caches.match(event.request).then(cached => {
+  e.respondWith(
+    caches.match(e.request).then(cached => {
       if (cached) return cached;
-      return fetch(event.request).then(res => {
-        if (!res || res.status !== 200 || res.type === 'opaque') return res;
-        const clone = res.clone();
-        caches.open(CACHE_NAME).then(c => c.put(event.request, clone));
+      return fetch(e.request).then(res => {
+        if (res.ok && e.request.method==='GET') { const cl=res.clone(); caches.open(CACHE).then(c=>c.put(e.request,cl)); }
         return res;
-      }).catch(() => {
-        // Offline fallback for navigation
-        if (event.request.mode === 'navigate') {
-          return caches.match('./index.html');
-        }
-      });
+      }).catch(() => { if (e.request.mode==='navigate') return caches.match('/index.html'); });
     })
   );
 });
+
+self.addEventListener('push', e => {
+  const d = e.data ? e.data.json() : {title:'Vigil',body:'The castle requires your attention.',tab:'home'};
+  e.waitUntil(self.registration.showNotification(d.title||'Vigil',{body:d.body||'',icon:'/icon-192.png',tag:d.tag||'vigil',data:{tab:d.tab||'home'},vibrate:[100,50,100],requireInteraction:!!d.sticky}));
+});
+
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  const tab = e.notification.data?.tab || 'home';
+  e.waitUntil(clients.matchAll({type:'window',includeUncontrolled:true}).then(list => {
+    for (const c of list) { if (c.url.includes(self.location.origin) && 'focus' in c) { c.focus(); c.postMessage({type:'NAVIGATE',tab}); return; } }
+    if (clients.openWindow) return clients.openWindow('/?tab='+tab);
+  }));
+});
+
+self.addEventListener('sync', e => {
+  if (e.tag==='sync-gold') e.waitUntil(syncGold());
+});
+
+self.addEventListener('periodicsync', e => {
+  if (e.tag==='daily-briefing') e.waitUntil(self.registration.showNotification('Vigil — The Watch begins',{body:'A new day in the castle.',icon:'/icon-192.png',tag:'briefing',data:{tab:'home'},vibrate:[50,30,50]}));
+});
+
+self.addEventListener('message', e => {
+  if (e.data?.type==='SKIP_WAITING') self.skipWaiting();
+  if (e.data?.type==='SHOW_NOTIFICATION') {
+    self.registration.showNotification(e.data.title,{body:e.data.body,icon:'/icon-192.png',tag:e.data.tag||'vigil-'+Date.now(),data:{tab:e.data.tab||'home'},vibrate:e.data.vibrate||[100,50,100],silent:!!e.data.silent});
+  }
+});
+
+async function syncGold() {
+  try {
+    const [g,fx] = await Promise.all([fetch('https://api.metals.live/v1/spot/gold'),fetch('https://open.er-api.com/v6/latest/USD')]);
+    const gj=await g.json(), fxj=await fx.json();
+    const all = await clients.matchAll({includeUncontrolled:true});
+    all.forEach(c=>c.postMessage({type:'GOLD_UPDATED',usdPerOz:gj[0]?.price,egpRate:fxj.rates?.EGP,ts:Date.now()}));
+  } catch(_){}
+}

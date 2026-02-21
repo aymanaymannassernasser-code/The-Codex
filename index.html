@@ -3,75 +3,87 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#03050A">
+  <meta name="theme-color" content="#02040A">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Vigil">
   <link rel="manifest" href="manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;500;600;700&family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;500;600;700&family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <title>Vigil</title>
 </head>
 <body>
   <div id="app">
 
-    <!-- ── HEADER ── -->
+    <!-- OFFLINE BANNER -->
+    <div id="offline-banner" class="offline-banner hidden">
+      <span>⚠</span> Operating offline — the castle holds
+    </div>
+
+    <!-- INSTALL BANNER -->
+    <div id="install-banner" class="install-banner hidden">
+      <div class="install-text">Add Vigil to your homescreen</div>
+      <button id="install-btn" class="btn btn-sm">Install</button>
+      <button id="install-dismiss" class="btn-ghost">✕</button>
+    </div>
+
+    <!-- HEADER -->
     <header id="app-header">
-      <button id="back-btn" class="header-back" aria-label="Return to Vigil">
-        <span class="back-arrow">&#8592;</span>
-        <span class="back-label">Vigil</span>
+      <button id="back-btn" class="header-back" aria-label="Return to the Keep">
+        <span class="back-arrow">←</span>
+        <span class="back-label">Keep</span>
       </button>
       <div class="header-center">
-        <div class="header-ornament">◈</div>
-        <h1 id="header-title">VIGIL</h1>
-        <div class="header-ornament">◈</div>
+        <div class="header-orn">◈</div>
+        <h1 id="header-title">THE RED KEEP</h1>
+        <div class="header-orn">◈</div>
       </div>
-      <div class="header-right-spacer"></div>
+      <button id="settings-btn" class="header-settings" aria-label="Settings">⚙</button>
     </header>
 
-    <!-- ── MAIN CONTENT ── -->
+    <!-- CONTENT -->
     <main id="content">
-      <section id="tab-home"     class="tab-content active"></section>
-      <section id="tab-treasury" class="tab-content"></section>
-      <section id="tab-habits"   class="tab-content"></section>
-      <section id="tab-gym"      class="tab-content"></section>
-      <section id="tab-study"    class="tab-content"></section>
-      <section id="tab-journal"  class="tab-content"></section>
+      <section id="tab-home"      class="tab-content active"></section>
+      <section id="tab-coin"      class="tab-content"></section>
+      <section id="tab-hand"      class="tab-content"></section>
+      <section id="tab-commander" class="tab-content"></section>
+      <section id="tab-maester"   class="tab-content"></section>
+      <section id="tab-whispers"  class="tab-content"></section>
     </main>
 
-    <!-- ── BOTTOM NAV ── -->
+    <!-- BOTTOM NAV -->
     <nav id="main-nav">
       <button class="nav-tab active" data-tab="home">
-        <span class="nav-icon">◈</span>
-        <span class="nav-label">Vigil</span>
-      </button>
-      <button class="nav-tab" data-tab="treasury">
-        <span class="nav-icon">⚖</span>
-        <span class="nav-label">Account</span>
-      </button>
-      <button class="nav-tab" data-tab="habits">
-        <span class="nav-icon">◉</span>
-        <span class="nav-label">Watch</span>
-      </button>
-      <button class="nav-tab" data-tab="gym">
         <span class="nav-icon">⬡</span>
-        <span class="nav-label">Vessel</span>
+        <span class="nav-label">Keep</span>
       </button>
-      <button class="nav-tab" data-tab="study">
-        <span class="nav-icon">◬</span>
-        <span class="nav-label">Lamp</span>
+      <button class="nav-tab" data-tab="coin">
+        <span class="nav-icon">⚖</span>
+        <span class="nav-label">Coin</span>
       </button>
-      <button class="nav-tab" data-tab="journal">
-        <span class="nav-icon">𝍌</span>
-        <span class="nav-label">Witness</span>
+      <button class="nav-tab" data-tab="hand">
+        <span class="nav-icon">✦</span>
+        <span class="nav-label">Hand</span>
+      </button>
+      <button class="nav-tab" data-tab="commander">
+        <span class="nav-icon">⚔</span>
+        <span class="nav-label">Commander</span>
+      </button>
+      <button class="nav-tab" data-tab="maester">
+        <span class="nav-icon">⊕</span>
+        <span class="nav-label">Maester</span>
+      </button>
+      <button class="nav-tab" data-tab="whispers">
+        <span class="nav-icon">◈</span>
+        <span class="nav-label">Whispers</span>
       </button>
     </nav>
 
   </div>
 
-  <!-- ── MODAL ── -->
+  <!-- MODAL -->
   <div id="modal-overlay" class="hidden" role="dialog" aria-modal="true">
     <div id="modal-box">
       <button id="modal-close" aria-label="Close">✕</button>
@@ -79,7 +91,28 @@
     </div>
   </div>
 
-  <!-- ── TOAST ── -->
+  <!-- SETTINGS PANEL -->
+  <div id="settings-overlay" class="settings-overlay hidden">
+    <div id="settings-panel">
+      <div class="settings-header">
+        <div class="settings-title">◈ Settings</div>
+        <button id="settings-close">✕</button>
+      </div>
+      <div id="settings-body"></div>
+    </div>
+  </div>
+
+  <!-- REST TIMER OVERLAY -->
+  <div id="rest-overlay" class="rest-overlay hidden">
+    <div class="rest-content">
+      <div class="rest-label">Rest</div>
+      <div class="rest-clock" id="rest-clock">1:30</div>
+      <div class="rest-exercise" id="rest-exercise"></div>
+      <button class="btn btn-sm" onclick="skipRest()">Skip Rest</button>
+    </div>
+  </div>
+
+  <!-- TOAST -->
   <div id="toast"></div>
 
   <script src="app.js"></script>
