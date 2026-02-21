@@ -35,20 +35,26 @@ function todayHijri() { return hijriString(today(), CONFIG.hijriOffset||0); }
 const QUOTES = [
   { text:"The duty of the man who investigates the writings of scientists is to make himself an enemy of all that he reads, and attack it from every side.",author:"Ibn al-Haytham",era:"Kitāb al-Manāẓir, Preface · Basra, c. 1011 CE" },
   { text:"The moving finger writes; and, having writ, moves on — nor all thy piety nor wit shall lure it back to cancel half a line, nor all thy tears wash out a word of it.",author:"Omar Khayyām",era:"Rubāʿiyyāt, LXXI · trans. FitzGerald · Nishapur, c. 1100 CE" },
-  { text:"The past resembles the future more than one drop of water resembles another.",author:"Ibn Khaldūn",era:"Muqaddima, Book One · Tunis, 1377 CE" },
+  { text:"One does not attain everything he wishes for. The winds blow contrary to what the ships desire.",author:"Al-Mutanabbī",era:"Dīwān al-Mutanabbī · Kūfa, c. 960 CE · trans. Arberry" },
   { text:"The knowledge of anything is not acquired or complete unless it is known by its causes.",author:"Ibn Sina",era:"Kitāb al-Shifāʾ, Logic · Hamadan, c. 1020 CE" },
   { text:"He who does not know himself does not know anything else.",author:"Al-Kindī",era:"Fī al-Falsafat al-Ūlā · Baghdad, c. 850 CE" },
+  { text:"Never forget what you are. The rest of the world will not. Wear it like armor and it can never be used to hurt you.",author:"Tyrion Lannister",era:"Game of Thrones · Season 1, Episode 1 · 2011" },
   { text:"I have never met a wise man who regretted that he had been silent.",author:"Al-Jāḥiẓ",era:"Al-Bayān wa al-Tabyīn · Basra, c. 845 CE" },
-  { text:"Social organization is necessary to the human species. Without it, the existence of human beings would be incomplete.",author:"Ibn Khaldūn",era:"Muqaddima · Tunis, 1377 CE" },
-  { text:"Act swiftly on the hour that is given to you, for every hour that passes is irrecoverable.",author:"Ibn ʿAṭāʾ Allāh al-Iskandarī",era:"Al-Ḥikam · Alexandria, c. 1280 CE · paraphrase" },
-  { text:"India is a different world. We ought to study it without prejudice, if we wish to understand it.",author:"Al-Bīrūnī",era:"Taḥqīq mā lil-Hind, Preface · Ghazni, c. 1030 CE" },
+  { text:"Resolutions are measured against those who make them; noble deeds come in proportion to the noble.",author:"Al-Mutanabbī",era:"Dīwān — to Sayf al-Dawla · Aleppo, c. 948 CE · trans. Arberry" },
+  { text:"Act swiftly on the hour that is given to you, for every hour that passes is irrecoverable.",author:"Ibn ʿAṭāʾ Allāh al-Iskandarī",era:"Al-Ḥikam · Alexandria, c. 1280 CE" },
   { text:"Know yourself in talents and capacity, in judgment and inclination. You cannot master yourself unless you know yourself.",author:"Baltasar Gracián",era:"Oráculo Manual, Maxim I · Zaragoza, 1647" },
+  { text:"When you play the game of thrones, you win or you die. There is no middle ground.",author:"Cersei Lannister",era:"Game of Thrones · Season 1, Episode 7 · 2011" },
   { text:"Never act from passion. If you do so, set yourself to oppose your first impulse and you will correct your course in time.",author:"Baltasar Gracián",era:"Oráculo Manual, Maxim 8 · Zaragoza, 1647" },
+  { text:"The desert knows me well, the night, the mounted men — the battle and the sword, the paper and the pen.",author:"Al-Mutanabbī",era:"Dīwān al-Mutanabbī · c. 960 CE · trans. Nicholson" },
   { text:"Never spend your full capacity. The wise man does not display all he has, for tomorrow he may need it.",author:"Baltasar Gracián",era:"Oráculo Manual, Maxim 130 · Zaragoza, 1647" },
-  { text:"The end of all activity is the end of inactivity; but the end of knowledge is perpetual wonder.",author:"Al-Kindī",era:"Attributed in biographical sources · Baghdad, c. 870 CE" },
+  { text:"The end of all activity is the end of inactivity; but the end of knowledge is perpetual wonder.",author:"Al-Kindī",era:"Attributed · Baghdad, c. 870 CE" },
+  { text:"Chaos isn't a pit. Chaos is a ladder. Many who try to climb it fail and never get to try again.",author:"Petyr Baelish",era:"Game of Thrones · Season 3, Episode 6 · 2013" },
   { text:"I was living in a constant state of tension; often I felt as if gigantic blocks of stone were tumbling down upon me. Yet there was a demonic strength in me.",author:"C.G. Jung",era:"Memories, Dreams, Reflections · Zurich, 1962" },
+  { text:"It is not enough to love; you must know how to love.",author:"Mahmoud Darwish",era:"Fī Ḥaḍrat al-Ghiyāb · Ramallah, 2006" },
   { text:"The most terrifying thing is to accept oneself completely.",author:"C.G. Jung",era:"Attributed · Collected Works, Vol. 12" },
+  { text:"All men should keep their word, kings most of all.",author:"Robb Stark",era:"Game of Thrones · Season 1 · 2011" },
   { text:"Whoever wishes to investigate must consider the following: first, the physical constitution in all its complexity.",author:"Ibn Sina",era:"Al-Qānūn fī al-Ṭibb, Book One · c. 1025 CE" },
+  { text:"May God have mercy on a person who knows his own worth and acts accordingly.",author:"Umar ibn ʿAbd al-ʿAzīz",era:"Attributed · Damascus, c. 720 CE" },
 ];
 
 /* ══ DEFAULT DATA ════════════════════════════════ */
@@ -92,6 +98,8 @@ let CONFIG = {
   pomodoroLongBreak: 15,
   restTimerDuration: 90,
   wakeLockEnabled: true,
+  vaultPINHash: null,
+  goldKarat: 21,
 };
 
 /* ══ STATE ═══════════════════════════════════════ */
@@ -108,6 +116,7 @@ let STATE = {
   coinView: 'log',
   wakeLock: null,
   deferredInstall: null,
+  vaultUnlocked: false,
 };
 
 let DATA = {};
@@ -403,7 +412,18 @@ function renderSettings() {
     </div>
 
     <div class="settings-section">
-      <div class="settings-section-title">Data</div>
+      <div class="settings-section-title">The Vault</div>
+      <div class="settings-row">
+        <div>
+          <div class="settings-label">Vault PIN</div>
+          <div class="settings-sub">${CONFIG.vaultPINHash ? 'PIN is set' : 'No PIN — vault is open'}</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          ${CONFIG.vaultPINHash ? `<button class="btn btn-sm btn-danger" onclick="clearVaultPIN()">Remove</button>` : ''}
+          <button class="btn btn-sm" onclick="changeVaultPIN()">Change</button>
+        </div>
+      </div>
+    </div>
       <div class="settings-row">
         <div><div class="settings-label">Export all data</div></div>
         <button class="btn btn-sm" onclick="exportData()">Export JSON</button>
@@ -818,42 +838,148 @@ function renderMonthComparison() {
 }
 
 function renderCoinVault(el) {
-  const price = DATA.treasury.cachedGoldPrice;
-  const rate  = DATA.treasury.cachedEgpRate;
-  const ts    = DATA.treasury.cachedGoldTs;
+  if (CONFIG.vaultPINHash && !STATE.vaultUnlocked) { renderVaultLocked(el); return; }
+  if (!CONFIG.vaultPINHash)                         { renderVaultSetPIN(el); return; }
+  renderVaultContent(el);
+}
+
+function renderVaultLocked(el) {
+  el.innerHTML = `
+    ${modHeader('The Reserve','◈ Al-Dhahab','Gold held and counted — every gram, every gain')}
+    <div class="card" style="text-align:center;padding:32px 16px">
+      <div style="font-size:40px;margin-bottom:14px;filter:drop-shadow(0 0 18px rgba(184,120,24,0.4))">🔒</div>
+      <div style="font-family:var(--kufi);font-size:16px;color:var(--amber);margin-bottom:6px">The Vault is Sealed</div>
+      <div class="text-stone text-sm mb-16">Enter your PIN to proceed</div>
+      <div id="pin-display" style="display:flex;justify-content:center;gap:14px;margin-bottom:22px">
+        ${[0,1,2,3].map(i=>`<div class="pin-dot" id="pin-dot-${i}"></div>`).join('')}
+      </div>
+      <div class="pin-pad">${[1,2,3,4,5,6,7,8,9,'',0,'⌫'].map(k=>`<button class="pin-key${k===''?' pin-key-empty':''}" ${k===''?'disabled':''} onclick="${k==='⌫'?'pinBackspace()':'pinPress('+k+')'}">${k}</button>`).join('')}</div>
+      <div id="pin-error" style="color:var(--cinnabar-bright);font-family:var(--cairo);font-size:12px;margin-top:14px;min-height:18px"></div>
+    </div>`;
+  window._pinEntry=''; window._pinMode='check'; window._pinFirst=null;
+}
+
+function renderVaultSetPIN(el) {
+  el.innerHTML = `
+    ${modHeader('The Reserve','◈ Al-Dhahab','Gold held and counted — every gram, every gain')}
+    <div class="card" style="text-align:center;padding:32px 16px">
+      <div style="font-size:34px;margin-bottom:12px;color:var(--amber)">◈</div>
+      <div style="font-family:var(--kufi);font-size:15px;color:var(--amber);margin-bottom:6px">Seal the Vault</div>
+      <div class="text-stone text-sm mb-16" id="pin-prompt">Set a 4-digit PIN to protect your reserve</div>
+      <div id="pin-display" style="display:flex;justify-content:center;gap:14px;margin-bottom:22px">
+        ${[0,1,2,3].map(i=>`<div class="pin-dot" id="pin-dot-${i}"></div>`).join('')}
+      </div>
+      <div class="pin-pad">${[1,2,3,4,5,6,7,8,9,'',0,'⌫'].map(k=>`<button class="pin-key${k===''?' pin-key-empty':''}" ${k===''?'disabled':''} onclick="${k==='⌫'?'pinBackspace()':'pinPress('+k+')'}">${k}</button>`).join('')}</div>
+      <div id="pin-error" style="color:var(--cinnabar-bright);font-family:var(--cairo);font-size:12px;margin-top:14px;min-height:18px"></div>
+      <button class="btn-ghost mt-12" onclick="skipVaultPIN()" style="font-family:var(--cairo);font-size:11px;color:var(--text-stone);background:none;border:none;cursor:pointer">Open without PIN</button>
+    </div>`;
+  window._pinEntry=''; window._pinMode='set'; window._pinFirst=null;
+}
+
+function skipVaultPIN() { CONFIG.vaultPINHash=null; STATE.vaultUnlocked=true; saveConfig(); renderCoinBody(); }
+
+function pinPress(digit) {
+  if (!window._pinEntry) window._pinEntry='';
+  if (window._pinEntry.length>=4) return;
+  window._pinEntry += String(digit);
+  updatePinDots();
+  if (window._pinEntry.length===4) setTimeout(submitPIN,180);
+}
+
+function pinBackspace() {
+  if (!window._pinEntry) return;
+  window._pinEntry=window._pinEntry.slice(0,-1);
+  updatePinDots();
+}
+
+function updatePinDots() {
+  const len=window._pinEntry?.length||0;
+  for (let i=0;i<4;i++) { const d=document.getElementById('pin-dot-'+i); if(d) d.classList.toggle('filled',i<len); }
+}
+
+async function hashPIN(pin) {
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('vigil-vault-'+pin));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+async function submitPIN() {
+  const pin=window._pinEntry||'';
+  const mode=window._pinMode||'check';
+  const hash=await hashPIN(pin);
+  const errEl=document.getElementById('pin-error');
+
+  if (mode==='set') {
+    if (!window._pinFirst) {
+      window._pinFirst=hash; window._pinEntry=''; updatePinDots();
+      const prompt=document.getElementById('pin-prompt'); if(prompt) prompt.textContent='Confirm your PIN';
+      if(errEl) errEl.textContent='';
+      return;
+    }
+    if (hash===window._pinFirst) {
+      CONFIG.vaultPINHash=hash; STATE.vaultUnlocked=true; saveConfig();
+      vibrate([50,30,80]); toast('◈ Vault sealed'); renderCoinBody();
+    } else {
+      window._pinFirst=null; window._pinEntry=''; updatePinDots();
+      const prompt=document.getElementById('pin-prompt'); if(prompt) prompt.textContent='Set a 4-digit PIN';
+      if(errEl) errEl.textContent='PINs did not match — try again';
+    }
+    return;
+  }
+  // check
+  if (hash===CONFIG.vaultPINHash) {
+    STATE.vaultUnlocked=true; vibrate([50,30,80]); renderCoinBody();
+  } else {
+    window._pinEntry=''; updatePinDots(); vibrate([100,50,100]);
+    if(errEl) { errEl.textContent='Incorrect PIN'; setTimeout(()=>{if(errEl)errEl.textContent='';},1800); }
+  }
+}
+
+function renderVaultContent(el) {
+  const price  = DATA.treasury.cachedGoldPrice;
+  const rate   = DATA.treasury.cachedEgpRate;
+  const ts     = DATA.treasury.cachedGoldTs;
   const entries = DATA.treasury.goldEntries||[];
-  const egpPerGram = price && rate ? (price * rate / 31.1035) : null;
+  const karat  = CONFIG.goldKarat||21;
+  const egpPerGram = price&&rate ? (price*rate/31.1035)*(karat/24) : null;
   const totalGrams = entries.reduce((a,e)=>a+e.grams,0);
-  const totalValue = egpPerGram ? totalGrams * egpPerGram : null;
+  const totalValue = egpPerGram ? totalGrams*egpPerGram : null;
 
   el.innerHTML = `
-    ${modHeader('The Reserve', '◈ Al-Dhahab', 'Gold holdings — Gracián\'s principle of reserve applied')}
+    ${modHeader('The Reserve','◈ Al-Dhahab','Gold held and counted — every gram, every gain')}
+    <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center">
+      <div class="text-stone text-xs" style="flex:1">Karat:</div>
+      ${[21,24,18,14].map(k=>`<button class="btn btn-xs ${karat===k?'btn-primary':''}" onclick="setGoldKarat(${k})">${k}K</button>`).join('')}
+      <button class="btn btn-xs btn-danger" onclick="lockVault()" style="margin-left:8px">🔒</button>
+    </div>
     <div class="gold-banner">
       <div>
-        <div class="gold-price-label">Gold per gram (EGP)</div>
-        <div class="gold-price-val">${egpPerGram ? fmtEGP(egpPerGram) : '—'}</div>
-        <div class="gold-price-ts">${ts ? 'Updated '+new Date(ts).toLocaleTimeString() : 'Offline — tap to retry'}</div>
+        <div class="gold-price-label">${karat}K per gram (EGP)</div>
+        <div class="gold-price-val">${egpPerGram?fmtEGP(egpPerGram):'—'}</div>
+        <div class="gold-price-ts">${ts?'Updated '+new Date(ts).toLocaleTimeString():'Offline — tap Refresh'}</div>
       </div>
       <div>
         <div class="gold-price-label">Total holding</div>
         <div class="gold-price-val">${totalGrams}g</div>
-        ${totalValue ? `<div class="gold-price-ts">≈ ${fmtEGP(totalValue)}</div>` : ''}
+        ${totalValue?`<div class="gold-price-ts">≈ ${fmtEGP(totalValue)}</div>`:''}
       </div>
       <button class="btn btn-sm" onclick="tryFetchGold(true)">Refresh</button>
     </div>
     <div class="card">
       ${entries.length ? entries.map(e=>{
-        const nowVal = egpPerGram ? e.grams * egpPerGram : null;
-        const paid   = e.paidEGP||0;
-        const gain   = nowVal ? nowVal - paid : null;
+        const entryKarat=e.karat||karat;
+        const entryEGP=price&&rate?(price*rate/31.1035)*(entryKarat/24):null;
+        const nowVal=entryEGP?e.grams*entryEGP:null;
+        const paid=e.paidEGP||0;
+        const gain=nowVal?nowVal-paid:null;
         return `<div class="gold-item">
-          <div class="flex-1">
-            <div class="gold-item-grams">${e.grams}g</div>
+          <div style="flex:1">
+            <div class="gold-item-grams">${e.grams}g · ${entryKarat}K</div>
             <div class="gold-item-meta">${formatDate(e.date)} · Paid ${fmtEGP(paid)}</div>
+            ${e.note?`<div class="gold-item-meta">${esc(e.note)}</div>`:''}
           </div>
           <div>
-            ${nowVal ? `<div class="gold-item-now">${fmtEGP(nowVal)}</div>
-              <div class="gold-item-gain ${gain>=0?'pos':'neg'}">${gain>=0?'+':''}${fmtEGP(gain)}</div>` : '<div class="gold-item-now">—</div>'}
+            ${nowVal?`<div class="gold-item-now">${fmtEGP(nowVal)}</div>
+              <div class="gold-item-gain ${gain>=0?'pos':'neg'}">${gain>=0?'+':''}${fmtEGP(gain)}</div>`:'<div class="gold-item-now">—</div>'}
           </div>
           <button class="tx-del" onclick="deleteGold('${e.id}')">✕</button>
         </div>`;
@@ -862,33 +988,42 @@ function renderCoinVault(el) {
     <button class="btn btn-primary btn-full mt-8" onclick="showAddGold()">⊕ Add Gold Entry</button>`;
 }
 
+function setGoldKarat(k) { CONFIG.goldKarat=k; saveConfig(); renderCoinBody(); }
+function lockVault()      { STATE.vaultUnlocked=false; renderCoinBody(); }
+function clearVaultPIN()  { CONFIG.vaultPINHash=null; STATE.vaultUnlocked=true; saveConfig(); toast('PIN removed'); renderSettings(); }
+function changeVaultPIN() { closeSettings(); STATE.coinView='vault'; CONFIG.vaultPINHash=null; STATE.vaultUnlocked=false; saveConfig(); showTab('coin'); }
+
 async function tryFetchGold(force=false) {
-  const now = Date.now();
-  if (!force && DATA.treasury.cachedGoldTs && now - DATA.treasury.cachedGoldTs < 3600000) return;
+  const now=Date.now();
+  if (!force&&DATA.treasury.cachedGoldTs&&now-DATA.treasury.cachedGoldTs<3600000) return;
   try {
-    const [g, fx] = await Promise.all([
+    const [g,fx]=await Promise.all([
       fetch('https://api.metals.live/v1/spot/gold'),
       fetch('https://open.er-api.com/v6/latest/USD')
     ]);
     const gj=await g.json(), fxj=await fx.json();
-    DATA.treasury.cachedGoldPrice = gj[0]?.price;
-    DATA.treasury.cachedEgpRate   = fxj.rates?.EGP;
-    DATA.treasury.cachedGoldTs    = Date.now();
+    DATA.treasury.cachedGoldPrice=gj[0]?.price;
+    DATA.treasury.cachedEgpRate=fxj.rates?.EGP;
+    DATA.treasury.cachedGoldTs=Date.now();
     saveData();
-    if (STATE.coinView==='vault') renderCoinBody();
+    if(STATE.coinView==='vault'&&STATE.vaultUnlocked) renderCoinBody();
   } catch(e) {
     if (navigator.serviceWorker.controller) {
-      navigator.serviceWorker.ready.then(reg => { if(reg.sync) reg.sync.register('sync-gold').catch(()=>{}); });
+      navigator.serviceWorker.ready.then(reg=>{if(reg.sync)reg.sync.register('sync-gold').catch(()=>{});});
     }
   }
 }
 
 function showAddGold() {
+  const karat = CONFIG.goldKarat||21;
   showModal(`<div class="modal-title">◈ Add Gold Entry</div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">Grams</label><input type="number" id="gold-grams" class="form-control" placeholder="e.g. 10" step="0.01" min="0.01" inputmode="decimal"></div>
-      <div class="form-group"><label class="form-label">Paid (EGP)</label><input type="number" id="gold-paid" class="form-control" placeholder="Total cost" min="0" inputmode="decimal"></div>
+      <div class="form-group"><label class="form-label">Karat</label>
+        <select id="gold-karat" class="form-control">${[21,24,18,14].map(k=>`<option value="${k}" ${k===karat?'selected':''}>${k}K</option>`).join('')}</select>
+      </div>
     </div>
+    <div class="form-group"><label class="form-label">Paid (EGP)</label><input type="number" id="gold-paid" class="form-control" placeholder="Total cost" min="0" inputmode="decimal"></div>
     <div class="form-group"><label class="form-label">Date purchased</label><input type="date" id="gold-date" class="form-control" value="${today()}"></div>
     <div class="form-group"><label class="form-label">Notes</label><input type="text" id="gold-note" class="form-control" placeholder="Optional"></div>
     <button class="btn btn-primary btn-full" onclick="saveGold()">Record</button>`);
@@ -897,7 +1032,7 @@ function showAddGold() {
 function saveGold() {
   const grams = parseFloat(document.getElementById('gold-grams').value);
   if (!grams || grams<=0) { toast('Enter valid grams'); return; }
-  DATA.treasury.goldEntries.push({ id:uid(), grams, paidEGP:parseFloat(document.getElementById('gold-paid').value)||0, date:document.getElementById('gold-date').value, note:document.getElementById('gold-note').value });
+  DATA.treasury.goldEntries.push({ id:uid(), grams, karat:parseInt(document.getElementById('gold-karat').value)||21, paidEGP:parseFloat(document.getElementById('gold-paid').value)||0, date:document.getElementById('gold-date').value, note:document.getElementById('gold-note').value });
   saveData(); hideModal(); toast('Gold recorded'); renderCoin();
 }
 
@@ -996,7 +1131,7 @@ function renderHand() {
   const views=['today','heatmap','manage'];
   const labels=['Today','Heatmap','Manage'];
   const v=STATE.habitView;
-  el.innerHTML = modHeader('The Hand of the King','Disciplines','Murāqaba — the watch that does not relent')+
+  el.innerHTML = modHeader('The Hand of the King','Disciplines','The daily disciplines — kept and broken')+
     `<div class="mod-tabs">${labels.map((l,i)=>`<button class="mod-tab ${v===views[i]?'active':''}" onclick="setHabitView('${views[i]}')">${l}</button>`).join('')}</div>
     <div id="hand-body"></div>`;
   addFAB('+', ()=>showAddHabit());
@@ -1234,7 +1369,7 @@ function renderCommander() {
   const views=['log','new','templates','body'];
   const labels=['Sessions','Train','Templates','Body'];
   const v=STATE.gymView;
-  el.innerHTML = modHeader('Lord Commander','The Yard','Physical readiness — the body in service of the mind')+
+  el.innerHTML = modHeader('Lord Commander','The Yard','Sessions, weight, and condition')+
     `<div class="mod-tabs">${labels.map((l,i)=>`<button class="mod-tab ${v===views[i]?'active':''}" onclick="setGymView('${views[i]}')">${l}</button>`).join('')}</div>
     <div id="gym-body"></div>`;
   renderGymBody();
@@ -1479,7 +1614,7 @@ function renderMaester() {
   const views=['timer','log','books','spaced','goals'];
   const labels=['Timer','Sessions','Reading','Review','Goals'];
   const v=STATE.studyView;
-  el.innerHTML = modHeader('Grand Maester','The Library','Knowledge recorded — sessions, books, spaced review')+
+  el.innerHTML = modHeader('Grand Maester','The Library','Time given, books read, understanding tested')+
     `<div class="mod-tabs">${labels.map((l,i)=>`<button class="mod-tab ${v===views[i]?'active':''}" onclick="setStudyView('${views[i]}')">${l}</button>`).join('')}</div>
     <div id="maester-body"></div>`;
   addFAB('+', ()=>STATE.studyView==='books'?showAddBook():STATE.studyView==='spaced'?showAddSpaced():showAddSession());
@@ -1852,7 +1987,7 @@ function renderWhispers() {
   const views=['entries','patterns','moods'];
   const labels=['Chronicle','Patterns','Moods'];
   const v=STATE.whisperView;
-  el.innerHTML = modHeader('Master of Whispers','The Chronicle','The private record — nightly account and honest witness')+
+  el.innerHTML = modHeader('Master of Whispers','The Chronicle','What occurred, what persists, what is carried forward')+
     `<div class="mod-tabs">${labels.map((l,i)=>`<button class="mod-tab ${v===views[i]?'active':''}" onclick="setWhisperView('${views[i]}')">${l}</button>`).join('')}</div>
     <div id="whispers-body"></div>`;
   addFAB('🕯️', ()=>showAddEntry());
