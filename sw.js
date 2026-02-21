@@ -2,8 +2,8 @@
    VIGIL — Service Worker v2.0
    Push · Sync · Periodic · Cache
 ════════════════════════════════════════ */
-const CACHE   = 'vigil-v2';
-const ASSETS  = ['/index.html','/style.css','/app.js','/manifest.json'];
+const CACHE   = 'vigil-v3';
+const ASSETS  = ['/index.html','/style.css','/app.js','/manifest.json','/icon-96.png','/icon-192.png','/icon-512.png'];
 const API_HX  = ['aladhan.com','metals.live','er-api.com','gold-api.com','fonts.googleapis.com','fonts.gstatic.com'];
 
 self.addEventListener('install',  e => { e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())); });

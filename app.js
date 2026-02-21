@@ -222,6 +222,9 @@ function setupNav() {
   document.getElementById('settings-btn').addEventListener('click', openSettings);
   document.getElementById('settings-close').addEventListener('click', closeSettings);
   document.getElementById('settings-overlay').addEventListener('click', e => { if(e.target.id==='settings-overlay') closeSettings(); });
+  document.getElementById('info-btn').addEventListener('click', openInfo);
+  document.getElementById('info-close').addEventListener('click', closeInfo);
+  document.getElementById('info-overlay').addEventListener('click', e => { if(e.target.id==='info-overlay') closeInfo(); });
 }
 
 function showTab(tab) {
@@ -316,6 +319,99 @@ function renderHome() {
       <div class="quote-author">${esc(q.author)}</div>
       <div class="quote-era">${esc(q.era)}</div>
     </div>`;
+}
+
+
+/* ══════════════════════════════════════════════════
+   INFO PANEL
+══════════════════════════════════════════════════ */
+function openInfo()  { renderInfo(); document.getElementById('info-overlay').classList.remove('hidden'); }
+function closeInfo() { document.getElementById('info-overlay').classList.add('hidden'); }
+
+function renderInfo() {
+  document.getElementById('info-body').innerHTML = `
+
+    <div class="info-dict-block">
+      <div class="info-dict-word">Vigil</div>
+      <div class="info-dict-pron">/ ˈvɪdʒ.ɪl /</div>
+      <div class="info-dict-pos">noun · first attested c. 1250</div>
+      <div class="info-dict-def"><b>1.</b> The act of keeping awake during the hours customarily given to sleep; a period of wakefulness maintained for a deliberate purpose.</div>
+      <div class="info-dict-def"><b>2.</b> A period of observation or watchful attention, at any hour, over that which requires guarding.</div>
+      <div class="info-dict-def"><b>3.</b> <i>Ecclesiastical.</i> The eve of a religious festival, observed by remaining awake in prayer and preparation. In the medieval rite of knighthood, the night before investiture — spent fasting, confessing, and watching alone in the chapel — was called the vigil. The candidate entered the ceremony having already stood guard over himself.</div>
+      <div class="info-dict-etym"><b>Etymology.</b> Middle English <i>vigile</i>, from Old French, from Latin <i>vigilia</i> — "wakefulness, a watch" — from <i>vigil</i>, "awake, alert," from <i>vigēre</i>, "to be lively, to be in full force." The Proto-Indo-European root is <i>*weǵ-</i>, meaning to be strong, to be alive. Cognate with <i>vigor</i>, <i>vegetate</i>, and <i>wake</i>. The word contains its own demand: to be awake is to be in force.</div>
+    </div>
+
+    <div class="info-section">
+      <div class="info-heading">The System</div>
+      <p class="info-prose">There is a kind of person who suspects that the examined life is not a philosophical luxury but a practical necessity — that the man who does not keep accounts of himself will be kept account of by circumstance, and will not enjoy the terms. This application is built for that person.</p>
+      <p class="info-prose">Vigil is a discipline system organized as a castle with five counselors. Each counselor holds a warrant — a specific domain of authority over the inner kingdom. Together they constitute what the medieval mind would have recognized as good governance of the self: the treasury known, the body trained, knowledge pursued, the daily order maintained, and the private record kept honestly.</p>
+      <p class="info-prose">The system does not invent anything. It assembles — from traditions separated by centuries and continents — a single coherent practice. The nightly account is Al-Ghazālī's <i>muhāsaba</i>. The monthly audit of what is truly yours is Al-Kindī's device against sorrow. The habit of never spending full capacity is Gracián's. The honest witness to one's own recurring patterns is Jung's confrontation with the shadow. None of these thinkers knew each other. All of them arrived at the same conclusion by different roads.</p>
+      <div class="info-quote">
+        <div class="info-quote-text">He who does not know himself does not know anything else.</div>
+        <div class="info-quote-attr">Al-Kindī · Fī al-Falsafat al-Ūlā · Baghdad, c. 850 CE</div>
+      </div>
+      <p class="info-prose">What makes a discipline system fail is almost never insufficient motivation. It is insufficient honesty. The ledger that records only income, the habit log that skips the bad weeks, the journal that performs reflection rather than conducting it — these are instruments of self-deception dressed as self-improvement. Vigil is designed against this. Every module asks for the real number, the real answer, the real account.</p>
+      <div class="info-quote">
+        <div class="info-quote-text">The duty of the man who investigates the writings of scientists is to make himself an enemy of all that he reads, and attack it from every side.</div>
+        <div class="info-quote-attr">Ibn al-Haytham · Kitāb al-Manāẓir · Basra, c. 1011 CE</div>
+      </div>
+      <p class="info-prose">Ibn al-Haytham wrote this about scientific inquiry. The principle extends. The man who keeps vigil over himself must be willing to be his own most rigorous critic — not out of self-punishment, but because only an honest witness can see what actually needs to change and what, in truth, is already working.</p>
+    </div>
+
+    <div class="info-section">
+      <div class="info-heading">The Five Counselors</div>
+      <p class="info-prose">The Small Council is not a metaphor borrowed carelessly. A king who rules without counsel rules badly and briefly. The counselors exist because no single faculty — financial, physical, intellectual, habitual, reflective — can govern well in isolation.</p>
+      <div class="info-counselors">
+        <div class="info-counselor"><div class="info-counselor-icon">⚖</div><div><div class="info-counselor-name">Master of Coin</div><div class="info-counselor-role">The Treasurer holds the complete account. He does not estimate — he knows. Every transaction, every reserve, every gram of gold. Al-Kindī observed that most human sorrow comes from treating contingent things as permanent possessions. The Treasurer distinguishes between the two.</div></div></div>
+        <div class="info-counselor"><div class="info-counselor-icon">✦</div><div><div class="info-counselor-name">The Hand</div><div class="info-counselor-role">The Hand runs the daily order. He does not wait for motivation — he maintains the standard regardless of weather or mood. His question is simply: was it kept? Everything else is comment.</div></div></div>
+        <div class="info-counselor"><div class="info-counselor-icon">⚔</div><div><div class="info-counselor-name">Lord Commander</div><div class="info-counselor-role">The body is the instrument through which the mind acts in the world. Ibn Sina devoted the first book of the Canon to this: the physical constitution must be understood and maintained with the same rigor as any other domain. The Lord Commander keeps the instrument fit.</div></div></div>
+        <div class="info-counselor"><div class="info-counselor-icon">⊕</div><div><div class="info-counselor-name">Grand Maester</div><div class="info-counselor-role">The Library holds what has been understood — not merely read, but tested against the mind and found true. The Grand Maester tracks time given, subjects pursued, and what each session actually produced. He does not accept the appearance of study in place of its substance.</div></div></div>
+        <div class="info-counselor"><div class="info-counselor-icon">◈</div><div><div class="info-counselor-name">Master of Whispers</div><div class="info-counselor-role">The Chronicle is the private account — what actually happened, not what was intended. Jung called the confrontation with one's own recurring patterns the most important work a person can do, and the most consistently avoided. The Master of Whispers makes it unavoidable.</div></div></div>
+      </div>
+    </div>
+
+    <div class="info-section">
+      <div class="info-heading">On Discipline</div>
+      <p class="info-prose">The word discipline comes from the Latin <i>discipulus</i> — a learner, a follower. Its root is <i>discere</i>, to learn. Discipline is not, at its origin, about punishment or denial. It is about the relationship between a person and something they have chosen to master.</p>
+      <div class="info-quote">
+        <div class="info-quote-text">Resolutions are measured against those who make them; noble deeds come in proportion to the noble.</div>
+        <div class="info-quote-attr">Al-Mutanabbī · Dīwān, to Sayf al-Dawla · Aleppo, c. 948 CE</div>
+      </div>
+      <p class="info-prose">Al-Mutanabbī wrote this as praise of a king. It reads as an honest law: the quality of what you actually do is a direct measure of the quality of who you actually are. There is no flattery in the record. The log is the mirror.</p>
+      <div class="info-quote">
+        <div class="info-quote-text">Never act from passion. If you do so, set yourself to oppose your first impulse and you will correct your course in time.</div>
+        <div class="info-quote-attr">Baltasar Gracián · Oráculo Manual, Maxim 8 · Zaragoza, 1647</div>
+      </div>
+      <p class="info-prose">Gracián's maxims are not aphorisms for framing. They are operational instructions for someone who has decided to govern themselves rather than be governed by circumstance. Never spend your full capacity. Know the hour. Know your strong suit. These are engineering specifications for a kind of person — precise, self-possessed, difficult to surprise.</p>
+    </div>
+
+    <div class="info-section">
+      <div class="info-heading">On the Private Record</div>
+      <div class="info-quote">
+        <div class="info-quote-text">I was living in a constant state of tension; often I felt as if gigantic blocks of stone were tumbling down upon me. Yet there was a demonic strength in me.</div>
+        <div class="info-quote-attr">C.G. Jung · Memories, Dreams, Reflections · Zurich, 1962</div>
+      </div>
+      <p class="info-prose">Jung kept a journal for most of his life. When he was in his most severe period of psychological crisis — the years that produced the Red Book — he wrote obsessively, recorded dreams in full, and sat with what he found rather than explaining it away. He called this the confrontation with the unconscious. The method was simply this: write it down honestly, and then look at what you wrote.</p>
+      <p class="info-prose">The Three Questions in the nightly account are drawn from Al-Ghazālī's structure of the evening examination: what was intended, what occurred, where attention went without being sent. This is not therapy. It is the same accounting practice applied to time and attention that the Treasurer applies to money. Nothing is condemned. Everything is seen.</p>
+      <div class="info-quote">
+        <div class="info-quote-text">One does not attain everything he wishes for. The winds blow contrary to what the ships desire.</div>
+        <div class="info-quote-attr">Al-Mutanabbī · Dīwān · Kūfa, c. 960 CE · trans. Arberry</div>
+      </div>
+      <p class="info-prose">The Chronicle is where you keep the account of this — the gap between intention and occurrence, recorded over time, until the pattern becomes visible. When a theme appears three times without resolution, it is not bad luck. It is information.</p>
+    </div>
+
+    <div class="info-section">
+      <div class="info-heading">What the Name Means</div>
+      <p class="info-prose">On the night before his knighting, the medieval squire entered the chapel alone. He bathed, fasted, confessed, and then stood watch until morning — not over an external enemy but over himself. He was preparing for something that would demand everything from him. He wanted to arrive having already accounted for what he was carrying.</p>
+      <p class="info-prose">This application is built on the same premise. The work is not extraordinary. It is ten minutes at night with three honest questions. It is recording a transaction when it happens rather than reconstructing it at the end of the month. It is marking a habit kept, and not marking it when it wasn't. It is modest in its individual actions and serious in its cumulative effect.</p>
+      <p class="info-prose">The vigil is not the performance of discipline. It is the condition that makes discipline possible. You cannot keep watch over what you have not first agreed to see.</p>
+      <div class="info-quote">
+        <div class="info-quote-text">May God have mercy on a person who knows his own worth and acts accordingly.</div>
+        <div class="info-quote-attr">Umar ibn ʿAbd al-ʿAzīz · attributed · Damascus, c. 720 CE</div>
+      </div>
+    </div>
+
+    <div style="text-align:center;padding:18px 0 6px;color:var(--amber-dim);font-size:14px;font-family:var(--amiri);font-style:italic;letter-spacing:0.2em">◈</div>`;
 }
 
 /* ══════════════════════════════════════════════════

@@ -2,31 +2,38 @@
   "name": "Vigil — The Inner Castle",
   "short_name": "Vigil",
   "description": "A personal discipline system. Five counselors. One castle.",
-  "start_url": "./",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#02040A",
   "theme_color": "#02040A",
   "icons": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' fill='%2302040A'/><text y='148' font-size='120' text-anchor='middle' x='96'>🕯️</text></svg>",
+      "src": "icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-192.png",
       "sizes": "192x192",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' fill='%2302040A'/><text y='400' font-size='320' text-anchor='middle' x='256'>🕯️</text></svg>",
+      "src": "icon-512.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ],
-  "categories": ["productivity","lifestyle","finance"],
+  "categories": ["productivity", "lifestyle", "finance"],
   "shortcuts": [
-    { "name": "Master of Coin",    "url": "./?tab=coin",       "description": "Financial accounts" },
-    { "name": "The Hand",          "url": "./?tab=hand",       "description": "Daily disciplines" },
-    { "name": "Lord Commander",    "url": "./?tab=commander",  "description": "Physical training" },
-    { "name": "Grand Maester",     "url": "./?tab=maester",    "description": "Study and learning" },
-    { "name": "Master of Whispers","url": "./?tab=whispers",   "description": "Private chronicles" }
+    { "name": "Master of Coin",     "url": "./index.html?tab=coin",       "description": "Financial accounts",   "icons": [{"src": "icon-96.png", "sizes": "96x96"}] },
+    { "name": "The Hand",           "url": "./index.html?tab=hand",       "description": "Daily disciplines",    "icons": [{"src": "icon-96.png", "sizes": "96x96"}] },
+    { "name": "Lord Commander",     "url": "./index.html?tab=commander",  "description": "Physical training",    "icons": [{"src": "icon-96.png", "sizes": "96x96"}] },
+    { "name": "Grand Maester",      "url": "./index.html?tab=maester",    "description": "Study and learning",   "icons": [{"src": "icon-96.png", "sizes": "96x96"}] },
+    { "name": "Master of Whispers", "url": "./index.html?tab=whispers",   "description": "Private chronicles",   "icons": [{"src": "icon-96.png", "sizes": "96x96"}] }
   ]
 }
